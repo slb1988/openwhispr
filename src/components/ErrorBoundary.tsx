@@ -8,12 +8,13 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  errorDetail?: string;
 }
 
 export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, errorDetail: undefined };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -22,6 +23,13 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("[ErrorBoundary] Uncaught error:", error, errorInfo);
+    const detail = `${error.name}: ${error.message}\n\nStack:\n${error.stack ?? "(no stack)"}\n\nComponent Stack:\n${errorInfo.componentStack ?? "(none)"}`;
+    // Write to main process log so it appears in debug logs
+    try {
+      (window as any).electronAPI?.debugLog?.(detail);
+    } catch {}
+    // Also store full detail for display
+    this.setState({ errorDetail: detail });
   }
 
   handleReload = () => {
@@ -37,9 +45,9 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
               {i18n.t("errorBoundary.title")}
             </h1>
             <p className="text-sm text-muted-foreground">{i18n.t("errorBoundary.description")}</p>
-            {this.state.error && (
-              <pre className="text-xs text-destructive bg-surface-1 rounded-md p-3 overflow-auto max-h-32 text-left">
-                {this.state.error.message}
+            {this.state.errorDetail && (
+              <pre className="text-xs text-destructive bg-surface-1 rounded-md p-3 overflow-auto max-h-64 text-left whitespace-pre-wrap break-all">
+                {this.state.errorDetail}
               </pre>
             )}
             <button

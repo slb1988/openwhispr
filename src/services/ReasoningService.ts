@@ -318,7 +318,7 @@ class ReasoningService extends BaseReasoningService {
         resultLength: result.length,
       });
 
-      return result;
+      return result.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
     } catch (error) {
       logger.logReasoning("PROVIDER_ERROR", {
         provider: providerId,
@@ -484,8 +484,7 @@ class ReasoningService extends BaseReasoningService {
             let content = parsed.choices?.[0]?.delta?.content;
             if (!content) continue;
 
-            const stripThinking =
-              (isLocalProvider || isLanCleanup) && config.disableThinking !== false;
+            const stripThinking = config.disableThinking !== false;
             if (stripThinking) {
               if (insideThinkBlock) {
                 const endIdx = content.indexOf("</think>");

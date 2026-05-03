@@ -46,6 +46,10 @@ export default function OpenAICompatiblePanel({
   const lastLoadedBaseRef = useRef<string | null>(null);
   const pendingBaseRef = useRef<string | null>(null);
   const latestBaseRef = useRef<string>(normalizeBaseUrl(baseUrl));
+  const modelRef = useRef(model);
+  const setModelRef = useRef(setModel);
+  useEffect(() => { modelRef.current = model; }, [model]);
+  useEffect(() => { setModelRef.current = setModel; }, [setModel]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -159,8 +163,8 @@ export default function OpenAICompatiblePanel({
 
         if (isMountedRef.current && latestBaseRef.current === normalized) {
           setModelOptions(mapped);
-          if (model && mapped.length > 0 && !mapped.some((m) => m.value === model)) {
-            setModel("");
+          if (modelRef.current && mapped.length > 0 && !mapped.some((m) => m.value === modelRef.current)) {
+            setModelRef.current("");
           }
           setModelsError(null);
           lastLoadedBaseRef.current = normalized;
@@ -185,7 +189,7 @@ export default function OpenAICompatiblePanel({
         }
       }
     },
-    [baseUrl, apiKey, model, setModel, t]
+    [baseUrl, apiKey, t]
   );
 
   useEffect(() => {

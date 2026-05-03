@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Cloud, Key, Cpu, Network, Building2 } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
 import {
   useSettingsStore,
   selectResolvedLLMConfig,
@@ -55,7 +56,7 @@ interface InferenceConfigEditorProps {
 
 export default function InferenceConfigEditor({ scope, onModeChange }: InferenceConfigEditorProps) {
   const { t } = useTranslation();
-  const config = useSettingsStore((s) => selectResolvedLLMConfig(s, scope));
+  const config = useSettingsStore(useShallow((s) => selectResolvedLLMConfig(s, scope)));
   const isSignedIn = useSettingsStore((s) => s.isSignedIn);
 
   const prefix = MODE_LABEL_PREFIX[scope];
@@ -129,9 +130,13 @@ export default function InferenceConfigEditor({ scope, onModeChange }: Inference
     [scope, config.mode, config.provider, isSignedIn, onModeChange]
   );
 
-  const setMode = setField("mode");
-  const setProvider = setField("provider");
-  const setModel = setField("model");
+  const setMode = useCallback((v: string) => setResolvedLLMConfig(scope, { mode: v as InferenceMode }), [scope]);
+  const setProvider = useCallback((v: string) => setResolvedLLMConfig(scope, { provider: v }), [scope]);
+  const setModel = useCallback((v: string) => setResolvedLLMConfig(scope, { model: v }), [scope]);
+  const setRemoteUrl = useCallback((v: string) => setResolvedLLMConfig(scope, { remoteUrl: v }), [scope]);
+  const setCloudBaseUrl = useCallback((v: string) => setResolvedLLMConfig(scope, { cloudBaseUrl: v }), [scope]);
+  const setDisableThinking = useCallback((v: boolean) => setResolvedLLMConfig(scope, { disableThinking: v }), [scope]);
+  const setCustomApiKey = useCallback((v: string) => setResolvedLLMConfig(scope, { customApiKey: v }), [scope]);
 
   const renderModelSelector = (mode?: "cloud" | "local") => (
     <ReasoningModelSelector
@@ -140,9 +145,9 @@ export default function InferenceConfigEditor({ scope, onModeChange }: Inference
       localReasoningProvider={config.provider}
       setLocalReasoningProvider={setProvider}
       cloudReasoningBaseUrl={config.cloudBaseUrl ?? ""}
-      setCloudReasoningBaseUrl={setField("cloudBaseUrl")}
+      setCloudReasoningBaseUrl={setCloudBaseUrl}
       customReasoningApiKey={config.customApiKey ?? ""}
-      setCustomReasoningApiKey={setField("customApiKey")}
+      setCustomReasoningApiKey={setCustomApiKey}
       setReasoningMode={setMode}
       mode={mode}
     />
@@ -164,9 +169,9 @@ export default function InferenceConfigEditor({ scope, onModeChange }: Inference
       {config.mode === "self-hosted" && (
         <OpenAICompatiblePanel
           baseUrl={config.remoteUrl ?? ""}
-          setBaseUrl={setField("remoteUrl")}
+          setBaseUrl={setRemoteUrl}
           apiKey={config.customApiKey ?? ""}
-          setApiKey={setField("customApiKey")}
+          setApiKey={setCustomApiKey}
           model={config.model}
           setModel={setModel}
           baseUrlPlaceholder="http://192.168.1.126:11434/v1"
@@ -186,7 +191,7 @@ export default function InferenceConfigEditor({ scope, onModeChange }: Inference
             </h4>
             <p className="text-xs text-muted-foreground">{t("reasoning.disableThinking.help")}</p>
           </div>
-          <Toggle checked={config.disableThinking} onChange={setField("disableThinking")} />
+          <Toggle checked={config.disableThinking} onChange={setDisableThinking} />
         </div>
       )}
 
