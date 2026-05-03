@@ -1,5 +1,20 @@
 const { autoUpdater } = require("electron-updater");
 
+// Compares two version strings numerically per-segment (handles 1.6.10 < 1.7.0 correctly).
+// Pre-release suffixes (e.g. "-beta.1") are stripped before comparison.
+function isNewerVersion(remote, current) {
+  const parse = (v) => v.split("-")[0].split(".").map(Number);
+  const r = parse(remote);
+  const c = parse(current);
+  for (let i = 0; i < Math.max(r.length, c.length); i++) {
+    const rv = r[i] ?? 0;
+    const cv = c[i] ?? 0;
+    if (rv > cv) return true;
+    if (rv < cv) return false;
+  }
+  return false;
+}
+
 class UpdateManager {
   constructor() {
     this.mainWindow = null;
@@ -81,6 +96,13 @@ class UpdateManager {
         this.notifyRenderers("checking-for-update");
       },
       "update-available": (info) => {
+        const { app } = require("electron");
+        if (info?.version && !isNewerVersion(info.version, app.getVersion())) {
+          console.log(
+            `⚠️ Ignoring stale update signal: remote=${info.version} current=${app.getVersion()}`
+          );
+          return;
+        }
         this.updateAvailable = true;
         if (info) {
           this.lastUpdateInfo = {
@@ -168,6 +190,16 @@ class UpdateManager {
       const result = await autoUpdater.checkForUpdates();
 
       if (result?.isUpdateAvailable && result?.updateInfo) {
+        const { app } = require("electron");
+        if (!isNewerVersion(result.updateInfo.version, app.getVersion())) {
+          console.log(
+            `⚠️ Ignoring stale update: remote=${result.updateInfo.version} current=${app.getVersion()}`
+          );
+          return {
+            updateAvailable: false,
+            message: "You are running the latest version",
+          };
+        }
         console.log("📋 Update available:", result.updateInfo.version);
         return {
           updateAvailable: true,
