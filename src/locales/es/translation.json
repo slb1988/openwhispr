@@ -684,6 +684,27 @@
         "title": "No se pudo actualizar el registro de depuración"
       }
     },
+    "devUnlock": {
+      "label": "Desbloqueo Pro Dev",
+      "disabledDescription": "Activar para simular una suscripción Pro para pruebas locales",
+      "enabledDescription": "Las funciones Pro están desbloqueadas para esta sesión (solo dev)",
+      "warningLabel": "Solo para desarrolladores.",
+      "warningDescription": "Las restricciones de UI Pro se omiten en el lado del cliente. Las cuotas del backend y la sincronización en la nube aún requieren una suscripción real.",
+      "toasts": {
+        "enabled": {
+          "title": "Desbloqueo Dev Activado",
+          "description": "Las funciones Pro ahora están desbloqueadas para pruebas locales"
+        },
+        "disabled": {
+          "title": "Desbloqueo Dev Desactivado",
+          "description": "Las funciones Pro vuelven a su restricción normal"
+        },
+        "updateFailed": {
+          "title": "No se pudo actualizar el desbloqueo dev",
+          "description": "Algo salió mal. Inténtalo de nuevo."
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "Solicitudes API",

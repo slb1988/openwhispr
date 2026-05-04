@@ -922,6 +922,10 @@ declare global {
       }>;
       openLogsFolder: () => Promise<{ success: boolean; error?: string }>;
 
+      // Dev Pro unlock (local dev/testing only)
+      getDevUnlockState: () => Promise<{ enabled: boolean }>;
+      setDevUnlock: (enabled: boolean) => Promise<{ success: boolean; enabled?: boolean; error?: string }>;
+
       // FFmpeg availability
       checkFFmpegAvailability: () => Promise<FFmpegAvailabilityResult>;
       getAudioDiagnostics: () => Promise<AudioDiagnosticsResult>;

@@ -684,6 +684,27 @@
         "title": "Impossible de mettre à jour la journalisation de débogage"
       }
     },
+    "devUnlock": {
+      "label": "Déverrouillage Pro Dev",
+      "disabledDescription": "Activer pour simuler un abonnement Pro pour les tests locaux",
+      "enabledDescription": "Les fonctionnalités Pro sont déverrouillées pour cette session (dev uniquement)",
+      "warningLabel": "Dev uniquement.",
+      "warningDescription": "Les restrictions Pro de l'interface sont contournées côté client. Les quotas du backend et la synchronisation cloud nécessitent toujours un vrai abonnement.",
+      "toasts": {
+        "enabled": {
+          "title": "Déverrouillage Dev Activé",
+          "description": "Les fonctionnalités Pro sont maintenant déverrouillées pour les tests locaux"
+        },
+        "disabled": {
+          "title": "Déverrouillage Dev Désactivé",
+          "description": "Les fonctionnalités Pro reviennent à leur restriction normale"
+        },
+        "updateFailed": {
+          "title": "Impossible de mettre à jour le déverrouillage dev",
+          "description": "Un problème est survenu. Veuillez réessayer."
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "Requêtes API",

@@ -732,6 +732,27 @@
         "title": "Couldn't update debug logging"
       }
     },
+    "devUnlock": {
+      "label": "Dev Pro Unlock",
+      "disabledDescription": "Enable to simulate a Pro subscription for local testing",
+      "enabledDescription": "Pro features are unlocked for this session (dev only)",
+      "warningLabel": "Dev only.",
+      "warningDescription": "Pro UI gates are bypassed client-side. Backend quotas and cloud sync still require a real subscription.",
+      "toasts": {
+        "enabled": {
+          "title": "Dev Unlock Enabled",
+          "description": "Pro features are now unlocked for local testing"
+        },
+        "disabled": {
+          "title": "Dev Unlock Disabled",
+          "description": "Pro features are back to normal gating"
+        },
+        "updateFailed": {
+          "title": "Couldn't update dev unlock",
+          "description": "Something went wrong. Please try again."
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "API requests",

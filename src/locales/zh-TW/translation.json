@@ -684,6 +684,27 @@
         "title": "無法更新 Debug 記錄設定"
       }
     },
+    "devUnlock": {
+      "label": "Dev Pro 解鎖",
+      "disabledDescription": "啟用以在本地測試中模擬 Pro 訂閱",
+      "enabledDescription": "此工作階段的 Pro 功能已解鎖（僅限開發）",
+      "warningLabel": "僅限開發。",
+      "warningDescription": "Pro UI 限制已在用戶端繞過。後端配額和雲端同步仍需要真實訂閱。",
+      "toasts": {
+        "enabled": {
+          "title": "Dev 解鎖已啟用",
+          "description": "Pro 功能現已為本地測試解鎖"
+        },
+        "disabled": {
+          "title": "Dev 解鎖已停用",
+          "description": "Pro 功能已恢復正常限制"
+        },
+        "updateFailed": {
+          "title": "無法更新 Dev 解鎖",
+          "description": "發生錯誤，請再試一次。"
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "API 請求",

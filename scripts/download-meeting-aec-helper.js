@@ -97,6 +97,15 @@ async function main() {
     return;
   }
 
+  // Skip GitHub API call if all target binaries already exist
+  if (!args.isForce) {
+    const allExist = selected.every((t) => fs.existsSync(path.join(BIN_DIR, binaryName(t))));
+    if (allExist) {
+      console.log("\n[meeting-aec-helper] All binaries already exist, skipping download.");
+      return;
+    }
+  }
+
   if (VERSION_OVERRIDE) {
     console.log(`\n[meeting-aec-helper] Using pinned version: ${VERSION_OVERRIDE}`);
   } else {

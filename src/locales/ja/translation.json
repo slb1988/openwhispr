@@ -684,6 +684,27 @@
         "title": "デバッグログを更新できませんでした"
       }
     },
+    "devUnlock": {
+      "label": "Dev Proアンロック",
+      "disabledDescription": "ローカルテスト用にProサブスクリプションをシミュレートするために有効化",
+      "enabledDescription": "このセッションのPro機能がアンロックされました（devのみ）",
+      "warningLabel": "開発者専用。",
+      "warningDescription": "Pro UIの制限はクライアント側でバイパスされます。バックエンドのクォータとクラウド同期には引き続き実際のサブスクリプションが必要です。",
+      "toasts": {
+        "enabled": {
+          "title": "Devアンロック有効",
+          "description": "Pro機能がローカルテスト用にアンロックされました"
+        },
+        "disabled": {
+          "title": "Devアンロック無効",
+          "description": "Pro機能が通常の制限に戻りました"
+        },
+        "updateFailed": {
+          "title": "Devアンロックを更新できませんでした",
+          "description": "問題が発生しました。もう一度お試しください。"
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "API リクエスト",

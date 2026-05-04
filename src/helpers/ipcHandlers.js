@@ -6398,6 +6398,54 @@ class IPCHandlers {
       }
     });
 
+    ipcMain.handle("get-dev-unlock-state", async () => {
+      try {
+        return { enabled: process.env.OPENWHISPR_DEV_PRO_UNLOCK === "true" };
+      } catch (error) {
+        debugLogger.error("Failed to get dev unlock state:", error);
+        return { enabled: false };
+      }
+    });
+
+    ipcMain.handle("set-dev-unlock", async (event, enabled) => {
+      try {
+        const fs = require("fs");
+        const envPath = path.join(app.getPath("userData"), ".env");
+
+        let envContent = "";
+        if (fs.existsSync(envPath)) {
+          envContent = fs.readFileSync(envPath, "utf8");
+        }
+
+        const lines = envContent.split("\n");
+        const keyIndex = lines.findIndex((line) =>
+          line.trim().startsWith("OPENWHISPR_DEV_PRO_UNLOCK=")
+        );
+
+        if (enabled) {
+          if (keyIndex !== -1) {
+            lines[keyIndex] = "OPENWHISPR_DEV_PRO_UNLOCK=true";
+          } else {
+            if (lines.length > 0 && lines[lines.length - 1] !== "") lines.push("");
+            lines.push("# Dev unlock - grants Pro UI access for local testing");
+            lines.push("OPENWHISPR_DEV_PRO_UNLOCK=true");
+          }
+        } else {
+          if (keyIndex !== -1) lines.splice(keyIndex, 1);
+          const ci = lines.findIndex((l) => l.trim().startsWith("# Dev unlock"));
+          if (ci !== -1) lines.splice(ci, 1);
+        }
+
+        fs.writeFileSync(envPath, lines.join("\n"), "utf8");
+        process.env.OPENWHISPR_DEV_PRO_UNLOCK = enabled ? "true" : "";
+
+        return { success: true, enabled };
+      } catch (error) {
+        debugLogger.error("Failed to set dev unlock:", error);
+        return { success: false, error: error.message };
+      }
+    });
+
     ipcMain.handle("check-for-updates", async () => {
       return this.updateManager.checkForUpdates();
     });

@@ -15,6 +15,8 @@ export default function DeveloperSection() {
   const [isLoading, setIsLoading] = useState(true);
   const [isToggling, setIsToggling] = useState(false);
   const [copiedPath, setCopiedPath] = useState(false);
+  const [devUnlockEnabled, setDevUnlockEnabled] = useState(false);
+  const [isTogglingDevUnlock, setIsTogglingDevUnlock] = useState(false);
   const { toast } = useToast();
 
   const loadDebugState = useCallback(async () => {
@@ -38,6 +40,13 @@ export default function DeveloperSection() {
   useEffect(() => {
     loadDebugState();
   }, [loadDebugState]);
+
+  useEffect(() => {
+    if (!window.electronAPI?.getDevUnlockState) return;
+    window.electronAPI.getDevUnlockState().then((state) => {
+      setDevUnlockEnabled(state.enabled);
+    });
+  }, []);
 
   const handleToggleDebug = async () => {
     if (isToggling) return;
@@ -86,6 +95,30 @@ export default function DeveloperSection() {
         description: t("developerSection.toasts.openLogsFailed.description"),
         variant: "destructive",
       });
+    }
+  };
+
+  const handleToggleDevUnlock = async () => {
+    if (isTogglingDevUnlock) return;
+    try {
+      setIsTogglingDevUnlock(true);
+      const newState = !devUnlockEnabled;
+      const result = await window.electronAPI.setDevUnlock(newState);
+      if (!result.success) throw new Error(result.error || "Failed to update dev unlock");
+      setDevUnlockEnabled(newState);
+      toast({
+        title: t(newState ? "developerSection.devUnlock.toasts.enabled.title" : "developerSection.devUnlock.toasts.disabled.title"),
+        description: t(newState ? "developerSection.devUnlock.toasts.enabled.description" : "developerSection.devUnlock.toasts.disabled.description"),
+        variant: "success",
+      });
+    } catch {
+      toast({
+        title: t("developerSection.devUnlock.toasts.updateFailed.title"),
+        description: t("developerSection.devUnlock.toasts.updateFailed.description"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsTogglingDevUnlock(false);
     }
   };
 
@@ -186,6 +219,49 @@ export default function DeveloperSection() {
               <FolderOpen className="mr-2 h-3.5 w-3.5" />
               {t("developerSection.openLogsFolder")}
             </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Dev Pro Unlock */}
+      <div className="rounded-xl border border-border/60 dark:border-border-subtle bg-card dark:bg-surface-2 divide-y divide-border/40 dark:divide-border-subtle">
+        <div className="px-5 py-4">
+          <div className="flex items-center justify-between gap-6">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-medium text-foreground">
+                  {t("developerSection.devUnlock.label")}
+                </p>
+                <div
+                  className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                    devUnlockEnabled ? "bg-success" : "bg-muted-foreground/30"
+                  }`}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                {devUnlockEnabled
+                  ? t("developerSection.devUnlock.enabledDescription")
+                  : t("developerSection.devUnlock.disabledDescription")}
+              </p>
+            </div>
+            <div className="shrink-0">
+              <Toggle
+                checked={devUnlockEnabled}
+                onChange={handleToggleDevUnlock}
+                disabled={isLoading || isTogglingDevUnlock}
+              />
+            </div>
+          </div>
+        </div>
+
+        {devUnlockEnabled && (
+          <div className="px-5 py-4">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <span className="font-medium text-warning">
+                {t("developerSection.devUnlock.warningLabel")}
+              </span>{" "}
+              {t("developerSection.devUnlock.warningDescription")}
+            </p>
           </div>
         )}
       </div>

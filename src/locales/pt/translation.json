@@ -656,6 +656,27 @@
         "title": "Não foi possível atualizar o log de depuração"
       }
     },
+    "devUnlock": {
+      "label": "Desbloqueio Pro Dev",
+      "disabledDescription": "Ativar para simular uma assinatura Pro para testes locais",
+      "enabledDescription": "Funcionalidades Pro desbloqueadas para esta sessão (somente dev)",
+      "warningLabel": "Somente para desenvolvedores.",
+      "warningDescription": "As restrições de UI Pro são ignoradas no lado do cliente. Cotas do backend e sincronização na nuvem ainda requerem uma assinatura real.",
+      "toasts": {
+        "enabled": {
+          "title": "Desbloqueio Dev Ativado",
+          "description": "Funcionalidades Pro agora desbloqueadas para testes locais"
+        },
+        "disabled": {
+          "title": "Desbloqueio Dev Desativado",
+          "description": "Funcionalidades Pro voltaram à restrição normal"
+        },
+        "updateFailed": {
+          "title": "Não foi possível atualizar o desbloqueio dev",
+          "description": "Algo deu errado. Tente novamente."
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "Requisições de API",

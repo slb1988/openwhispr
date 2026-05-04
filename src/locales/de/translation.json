@@ -684,6 +684,27 @@
         "title": "Debug-Protokollierung konnte nicht aktualisiert werden"
       }
     },
+    "devUnlock": {
+      "label": "Dev Pro Entsperren",
+      "disabledDescription": "Aktivieren, um ein Pro-Abonnement für lokale Tests zu simulieren",
+      "enabledDescription": "Pro-Funktionen sind für diese Sitzung freigeschaltet (nur Dev)",
+      "warningLabel": "Nur für Entwickler.",
+      "warningDescription": "Pro-UI-Sperren werden clientseitig umgangen. Backend-Kontingente und Cloud-Sync erfordern weiterhin ein echtes Abonnement.",
+      "toasts": {
+        "enabled": {
+          "title": "Dev Entsperren Aktiviert",
+          "description": "Pro-Funktionen sind jetzt für lokale Tests freigeschaltet"
+        },
+        "disabled": {
+          "title": "Dev Entsperren Deaktiviert",
+          "description": "Pro-Funktionen kehren zur normalen Einschränkung zurück"
+        },
+        "updateFailed": {
+          "title": "Dev-Entsperren konnte nicht aktualisiert werden",
+          "description": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "API-Anfragen",

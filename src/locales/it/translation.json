@@ -684,6 +684,27 @@
         "title": "Impossibile aggiornare il logging di debug"
       }
     },
+    "devUnlock": {
+      "label": "Sblocco Pro Dev",
+      "disabledDescription": "Attiva per simulare un abbonamento Pro per i test locali",
+      "enabledDescription": "Le funzionalità Pro sono sbloccate per questa sessione (solo dev)",
+      "warningLabel": "Solo per sviluppatori.",
+      "warningDescription": "Le restrizioni Pro dell'interfaccia sono bypassate lato client. Le quote del backend e la sincronizzazione cloud richiedono ancora un abbonamento reale.",
+      "toasts": {
+        "enabled": {
+          "title": "Sblocco Dev Attivato",
+          "description": "Le funzionalità Pro sono ora sbloccate per i test locali"
+        },
+        "disabled": {
+          "title": "Sblocco Dev Disattivato",
+          "description": "Le funzionalità Pro tornano alla restrizione normale"
+        },
+        "updateFailed": {
+          "title": "Impossibile aggiornare lo sblocco dev",
+          "description": "Qualcosa è andato storto. Riprova."
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "Richieste API",

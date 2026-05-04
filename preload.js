@@ -451,6 +451,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   setDebugLogging: (enabled) => ipcRenderer.invoke("set-debug-logging", enabled),
   openLogsFolder: () => ipcRenderer.invoke("open-logs-folder"),
 
+  // Dev Pro unlock (local dev/testing only)
+  getDevUnlockState: () => ipcRenderer.invoke("get-dev-unlock-state"),
+  setDevUnlock: (enabled) => ipcRenderer.invoke("set-dev-unlock", enabled),
+
   // System settings helpers for microphone/audio permissions
   requestMicrophoneAccess: () => ipcRenderer.invoke("request-microphone-access"),
   checkMicrophoneAccess: () => ipcRenderer.invoke("check-microphone-access"),

@@ -684,6 +684,27 @@
         "title": "无法更新 Debug 日志设置"
       }
     },
+    "devUnlock": {
+      "label": "Dev Pro 解锁",
+      "disabledDescription": "启用以在本地测试中模拟 Pro 订阅",
+      "enabledDescription": "此会话的 Pro 功能已解锁（仅限开发）",
+      "warningLabel": "仅限开发。",
+      "warningDescription": "Pro UI 限制已在客户端绕过。后端配额和云同步仍需要真实订阅。",
+      "toasts": {
+        "enabled": {
+          "title": "Dev 解锁已启用",
+          "description": "Pro 功能现已为本地测试解锁"
+        },
+        "disabled": {
+          "title": "Dev 解锁已禁用",
+          "description": "Pro 功能已恢复正常限制"
+        },
+        "updateFailed": {
+          "title": "无法更新 Dev 解锁",
+          "description": "出了点问题，请重试。"
+        }
+      }
+    },
     "whatGetsLogged": {
       "items": {
         "apiRequests": "API 请求",

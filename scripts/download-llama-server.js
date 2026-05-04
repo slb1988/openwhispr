@@ -170,6 +170,24 @@ function getEntriesForPlatformArch(platformArch) {
 }
 
 async function main() {
+  fs.mkdirSync(BIN_DIR, { recursive: true });
+
+  const args = parseArgs();
+
+  // Skip GitHub API call if all target binaries already exist
+  if (!args.isForce) {
+    const entries = args.isCurrent
+      ? getEntriesForPlatformArch(args.platformArch)
+      : Object.entries(BINARIES);
+    const allExist = entries.every(([, config]) =>
+      fs.existsSync(path.join(BIN_DIR, config.outputName))
+    );
+    if (allExist) {
+      console.log("\n[llama-server] All binaries already exist, skipping download.");
+      return;
+    }
+  }
+
   if (VERSION_OVERRIDE) {
     console.log(`\n[llama-server] Using pinned version: ${VERSION_OVERRIDE}`);
   } else {
@@ -185,10 +203,6 @@ async function main() {
   }
 
   console.log(`\nDownloading llama-server binaries (${release.tag})...\n`);
-
-  fs.mkdirSync(BIN_DIR, { recursive: true });
-
-  const args = parseArgs();
 
   if (args.isCurrent) {
     const entries = getEntriesForPlatformArch(args.platformArch);

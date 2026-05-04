@@ -71,6 +71,22 @@ export function useUsage(): UseUsageResult | null {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const checkoutInFlightRef = useRef(false);
   const lastFetchRef = useRef<number>(0);
+  const [devUnlockEnabled, setDevUnlockEnabled] = useState(false);
+  const devUnlockEnabledRef = useRef(false);
+  const devUnlockLoadedRef = useRef(false);
+
+  useEffect(() => {
+    if (devUnlockLoadedRef.current) return;
+    devUnlockLoadedRef.current = true;
+    if (!window.electronAPI?.getDevUnlockState) return;
+    window.electronAPI.getDevUnlockState().then((state) => {
+      devUnlockEnabledRef.current = state.enabled;
+      setDevUnlockEnabled(state.enabled);
+      if (state.enabled) {
+        localStorage.setItem("isSubscribed", "true");
+      }
+    });
+  }, []);
 
   const fetchUsage = useCallback(async () => {
     if (!window.electronAPI?.cloudUsage) return;
@@ -96,7 +112,7 @@ export function useUsage(): UseUsageResult | null {
             resetAt: result.resetAt ?? "rolling",
           });
           lastFetchRef.current = Date.now();
-          localStorage.setItem("isSubscribed", String(result.isSubscribed ?? false));
+          localStorage.setItem("isSubscribed", devUnlockEnabledRef.current ? "true" : String(result.isSubscribed ?? false));
         } else {
           const error: any = new Error(result.error || "Failed to fetch usage");
           error.code = result.code;
@@ -117,6 +133,10 @@ export function useUsage(): UseUsageResult | null {
     if (!isLoaded || !isSignedIn) {
       lastFetchRef.current = 0;
       setData(null);
+      if (devUnlockEnabled) {
+        setIsLoading(false);
+        setHasLoaded(true);
+      }
       return;
     }
 
@@ -159,7 +179,7 @@ export function useUsage(): UseUsageResult | null {
       window.removeEventListener("usage-changed", handleUsageChanged);
       window.removeEventListener("upgrade-success", handleUpgradeSuccess);
     };
-  }, [isLoaded, isSignedIn, fetchUsage]);
+  }, [isLoaded, isSignedIn, fetchUsage, devUnlockEnabled]);
 
   const openCheckout = useCallback(
     async (opts?: {
@@ -245,11 +265,12 @@ export function useUsage(): UseUsageResult | null {
     []
   );
 
-  if (!isSignedIn) return null;
+  if (!isSignedIn && !devUnlockEnabled) return null;
 
   const wordsUsed = data?.wordsUsed ?? 0;
   const limit = data?.limit ?? 2000;
-  const isSubscribed = data?.isSubscribed ?? false;
+  const isSubscribed = devUnlockEnabled ? true : (data?.isSubscribed ?? false);
+  const isTrial = devUnlockEnabled ? true : (data?.isTrial ?? false);
   const status = data?.status ?? "active";
   const isPastDue = (data?.plan === "pro" || data?.plan === "business") && status === "past_due";
   const isOverLimit = !isSubscribed && limit > 0 && wordsUsed >= limit;
@@ -263,7 +284,7 @@ export function useUsage(): UseUsageResult | null {
     wordsRemaining: data?.wordsRemaining ?? (limit > 0 ? limit - wordsUsed : -1),
     limit,
     isSubscribed,
-    isTrial: data?.isTrial ?? false,
+    isTrial,
     trialDaysLeft: data?.trialDaysLeft ?? null,
     currentPeriodEnd: data?.currentPeriodEnd ?? null,
     billingInterval: data?.billingInterval ?? null,
