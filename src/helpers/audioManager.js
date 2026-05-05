@@ -820,7 +820,11 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
 
   async getAPIKey() {
     const s = getSettings();
-    const provider = s.cloudTranscriptionProvider || "openai";
+    const isSelfHostedTranscription =
+      s.transcriptionMode === "self-hosted" && !!s.remoteTranscriptionUrl?.trim();
+    const provider = isSelfHostedTranscription
+      ? "__self_hosted__"
+      : s.cloudTranscriptionProvider || "openai";
 
     // Check cache (invalidate if provider changed)
     if (this.cachedApiKey !== null && this.cachedApiKeyProvider === provider) {
@@ -829,7 +833,12 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
 
     let apiKey = null;
 
-    if (provider === "custom") {
+    if (isSelfHostedTranscription) {
+      // Self-hosted STT has its own URL field but no dedicated auth field in the UI.
+      // Do not silently reuse the BYOK custom-provider key here; that produces
+      // confusing 401s against local servers that expect no auth or a different scheme.
+      apiKey = null;
+    } else if (provider === "custom") {
       // Prefer store value (user-entered via UI) over main process (.env)
       apiKey = s.customTranscriptionApiKey || "";
       if (!apiKey.trim()) {
@@ -1733,6 +1742,10 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
   getTranscriptionModel() {
     try {
       const s = getSettings();
+      if (s.transcriptionMode === "self-hosted" && s.remoteTranscriptionUrl?.trim()) {
+        return "whisper-1";
+      }
+
       const provider = s.cloudTranscriptionProvider || "openai";
       const trimmedModel = (s.cloudTranscriptionModel || "").trim();
 
@@ -1770,11 +1783,17 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
 
   getTranscriptionEndpoint() {
     const s = getSettings();
-    const currentProvider = s.cloudTranscriptionProvider || "openai";
-    const currentBaseUrl = s.cloudTranscriptionBaseUrl || "";
+    const isSelfHostedTranscription =
+      s.transcriptionMode === "self-hosted" && !!s.remoteTranscriptionUrl?.trim();
+    const currentProvider = isSelfHostedTranscription
+      ? "__self_hosted__"
+      : s.cloudTranscriptionProvider || "openai";
+    const currentBaseUrl = isSelfHostedTranscription
+      ? s.remoteTranscriptionUrl || ""
+      : s.cloudTranscriptionBaseUrl || "";
 
     // Only use custom URL when provider is explicitly "custom"
-    const isCustomEndpoint = currentProvider === "custom";
+    const isCustomEndpoint = isSelfHostedTranscription || currentProvider === "custom";
 
     // Invalidate cache if provider or base URL changed
     if (
@@ -1813,6 +1832,7 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
         base = API_ENDPOINTS.TRANSCRIPTION_BASE;
       }
 
+      const trimmedBase = (base || "").trim();
       const normalizedBase = normalizeBaseUrl(base);
 
       logger.debug(
@@ -1866,9 +1886,26 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
       }
 
       let endpoint;
-      if (/\/audio\/(transcriptions|translations)$/i.test(normalizedBase)) {
+      if (/\/v1\/audio\/(transcriptions|translations)$/i.test(trimmedBase)) {
+        endpoint = trimmedBase.replace(/\/+$/, "");
+        logger.debug(
+          "STT endpoint: using full self-hosted path from config",
+          { endpoint },
+          "transcription"
+        );
+      } else if (/\/audio\/(transcriptions|translations)$/i.test(normalizedBase)) {
         endpoint = normalizedBase;
         logger.debug("STT endpoint: using full path from config", { endpoint }, "transcription");
+      } else if (isSelfHostedTranscription) {
+        const selfHostedPath = /\/v1$/i.test(normalizedBase)
+          ? "/audio/transcriptions"
+          : "/v1/audio/transcriptions";
+        endpoint = buildApiUrl(normalizedBase, selfHostedPath);
+        logger.debug(
+          "STT endpoint: appending self-hosted transcription path",
+          { base: normalizedBase, endpoint },
+          "transcription"
+        );
       } else {
         endpoint = buildApiUrl(normalizedBase, "/audio/transcriptions");
         logger.debug(

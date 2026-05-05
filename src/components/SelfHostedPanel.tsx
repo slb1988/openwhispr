@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { normalizeBaseUrl } from "../config/constants";
 import { Input } from "./ui/input";
 
 interface SelfHostedPanelProps {
@@ -22,6 +23,12 @@ export default function SelfHostedPanel({ service, url, onUrlChange }: SelfHoste
         <Input
           value={url}
           onChange={(e) => onUrlChange(e.target.value)}
+          onBlur={(e) => {
+            const normalized = normalizeBaseUrl(e.target.value);
+            if (normalized && normalized !== e.target.value) {
+              onUrlChange(normalized);
+            }
+          }}
           placeholder={placeholderUrl}
           className="h-8 text-sm"
         />

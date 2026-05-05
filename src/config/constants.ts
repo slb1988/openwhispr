@@ -5,6 +5,12 @@ export const normalizeBaseUrl = (value?: string | null): string => {
   let normalized = value.trim();
   if (!normalized) return "";
 
+  // Strip a common typo in local URLs such as http://127.0.0.1.:8000.
+  normalized = normalized.replace(
+    /^(https?:\/\/)(localhost|\d{1,3}(?:\.\d{1,3}){3})\.(?=[:/?#]|$)/i,
+    "$1$2"
+  );
+
   // Remove common API endpoint suffixes to get the base URL
   const suffixReplacements: Array<[RegExp, string]> = [
     [/\/v1\/chat\/completions$/i, "/v1"],
